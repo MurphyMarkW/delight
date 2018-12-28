@@ -6,6 +6,7 @@
 use std::num::Wrapping;
 
 
+const ZERO: Wrapping<usize> = Wrapping(0 as usize);
 const ONE: Wrapping<usize> = Wrapping(1 as usize);
 
 /// Converts the right-most 1 bit to a 0.
@@ -13,13 +14,14 @@ const ONE: Wrapping<usize> = Wrapping(1 as usize);
 ///
 /// ```
 /// # use delight::binary_turn_off_rightmost_one;
-/// let x = usize::from_str_radix("1001110", 2).unwrap();
+/// let x = usize::from_str_radix("11001110", 2).unwrap();
 /// let y = binary_turn_off_rightmost_one(x);
 ///
-/// assert_eq!(format!("{:b}", y), "1001100");
+/// assert_eq!(format!("{:08b}", y), "11001100");
 /// ```
 pub fn binary_turn_off_rightmost_one(x: usize) -> usize {
     let w = Wrapping(x);
+
     x & (w - ONE).0
 }
 
@@ -28,13 +30,14 @@ pub fn binary_turn_off_rightmost_one(x: usize) -> usize {
 ///
 /// ```
 /// # use delight::binary_turn_on_rightmost_zero;
-/// let x = usize::from_str_radix("1001111", 2).unwrap();
+/// let x = usize::from_str_radix("11001111", 2).unwrap();
 /// let y = binary_turn_on_rightmost_zero(x);
 ///
-/// assert_eq!(format!("{:b}", y), "1011111");
+/// assert_eq!(format!("{:08b}", y), "11011111");
 /// ```
 pub fn binary_turn_on_rightmost_zero(x: usize) -> usize {
     let w = Wrapping(x);
+
     x | (w + ONE).0
 }
 
@@ -43,13 +46,14 @@ pub fn binary_turn_on_rightmost_zero(x: usize) -> usize {
 ///
 /// ```
 /// # use delight::binary_turn_off_trailing_ones;
-/// let x = usize::from_str_radix("1011011", 2).unwrap();
+/// let x = usize::from_str_radix("11011011", 2).unwrap();
 /// let y = binary_turn_off_trailing_ones(x);
 ///
-/// assert_eq!(format!("{:b}", y), "1011000");
+/// assert_eq!(format!("{:08b}", y), "11011000");
 /// ```
 pub fn binary_turn_off_trailing_ones(x: usize) -> usize {
     let w = Wrapping(x);
+
     x & (w + ONE).0
 }
 
@@ -58,14 +62,49 @@ pub fn binary_turn_off_trailing_ones(x: usize) -> usize {
 ///
 /// ```
 /// # use delight::binary_turn_on_trailing_zeros;
-/// let x = usize::from_str_radix("1011000", 2).unwrap();
+/// let x = usize::from_str_radix("11011000", 2).unwrap();
 /// let y = binary_turn_on_trailing_zeros(x);
 ///
-/// assert_eq!(format!("{:b}", y), "1011111");
+/// assert_eq!(format!("{:08b}", y), "11011111");
 /// ```
 pub fn binary_turn_on_trailing_zeros(x: usize) -> usize {
     let w = Wrapping(x);
+
     x | (w - ONE).0
+}
+
+/// Generates the bitmask identifying the rightmost 0 bit.
+/// Returns 0 if there is no rightmost 0 bit.
+///
+/// ```
+/// # use delight::binary_rightmost_zero_bitmask;
+/// let x = usize::from_str_radix("11011011", 2).unwrap();
+/// let y = binary_rightmost_zero_bitmask(x);
+/// 
+/// assert_eq!(format!("{:08b}", y), "00000100");
+/// ```
+pub fn binary_rightmost_zero_bitmask(x: usize) -> usize {
+    let w = Wrapping(x);
+
+    // NOTE This uses some transformational logic to get this form.
+    ((ZERO - (w + ONE)) & (w + ONE)).0
+}
+
+/// Generates the bitmask identifying the rightmost 1 bit.
+/// Returns 0 if there is no rightmost 1 bit.
+///
+/// ```
+/// # use delight::binary_rightmost_one_bitmask;
+/// let x = usize::from_str_radix("11011000", 2).unwrap();
+/// let y = binary_rightmost_one_bitmask(x);
+/// 
+/// assert_eq!(format!("{:08b}", y), "00001000");
+/// ```
+pub fn binary_rightmost_one_bitmask(x:usize) -> usize {
+    let w = Wrapping(x);
+
+    // NOTE This uses some transformational logic to get this form.
+    x & (ZERO - w).0
 }
 
 #[cfg(test)]
@@ -75,33 +114,49 @@ mod tests {
 
     #[test]
     fn test_binary_turn_off_rightmost_one() {
-        let x = usize::from_str_radix("1001110", 2).unwrap();
+        let x = usize::from_str_radix("11001110", 2).unwrap();
         let y = binary_turn_off_rightmost_one(x);
 
-        assert_eq!(format!("{:b}", y), "1001100");
+        assert_eq!(format!("{:08b}", y), "11001100");
     }
 
     #[test]
     fn test_binary_turn_on_rightmost_zero() {
-        let x = usize::from_str_radix("1001111", 2).unwrap();
+        let x = usize::from_str_radix("11001111", 2).unwrap();
         let y = binary_turn_on_rightmost_zero(x);
 
-        assert_eq!(format!("{:b}", y), "1011111");
+        assert_eq!(format!("{:08b}", y), "11011111");
     }
 
     #[test]
     fn test_binary_turn_off_trailing_ones() {
-        let x = usize::from_str_radix("1011011", 2).unwrap();
+        let x = usize::from_str_radix("11011011", 2).unwrap();
         let y = binary_turn_off_trailing_ones(x);
 
-        assert_eq!(format!("{:b}", y), "1011000");
+        assert_eq!(format!("{:08b}", y), "11011000");
     }
 
     #[test]
     fn test_binary_turn_on_trailing_zeros() {
-        let x = usize::from_str_radix("1011000", 2).unwrap();
+        let x = usize::from_str_radix("11011000", 2).unwrap();
         let y = binary_turn_on_trailing_zeros(x);
 
-        assert_eq!(format!("{:b}", y), "1011111");
+        assert_eq!(format!("{:08b}", y), "11011111");
+    }
+
+    #[test]
+    fn test_binary_rightmost_zero_bitmask() {
+        let x = usize::from_str_radix("11011011", 2).unwrap();
+        let y = binary_rightmost_zero_bitmask(x);
+
+        assert_eq!(format!("{:08b}", y), "00000100");
+    }
+
+    #[test]
+    fn test_binary_rightmost_one_bitmask() {
+        let x = usize::from_str_radix("11011000", 2).unwrap();
+        let y = binary_rightmost_one_bitmask(x);
+
+        assert_eq!(format!("{:08b}", y), "00001000");
     }
 }
