@@ -1,3 +1,14 @@
+###### This is a passion project. You probably don't want to use this.
+
+# Delight
+
+A run through of Hacker's Delight by Henry S. Warren Jr., written in Rust.
+
+## Why?
+
+Because I got the book as a birthday present, and I'm continually working to
+improve my Rust knowledge. It seemed like a good fit!
+
 ## License
 
 Licensed under either of
