@@ -1,8 +1,3 @@
-#![feature(test)]
-
-extern crate test;
-
-
 // Operations like + on u32 values is intended to never overflow. This is
 // problematic for certain operations that depend on overflow and underflow,
 // such as the following bitwise arithmetic. We avoid the issue of overflow
@@ -43,13 +38,40 @@ pub fn binary_turn_on_rightmost_zero(x: usize) -> usize {
     x | (w + ONE).0
 }
 
+/// Converts any trailing 1 bits to 0.
+/// Returns the input if it has no trailing 1 bits.
+///
+/// ```
+/// # use delight::binary_turn_off_trailing_ones;
+/// let x = usize::from_str_radix("1011011", 2).unwrap();
+/// let y = binary_turn_off_trailing_ones(x);
+///
+/// assert_eq!(format!("{:b}", y), "1011000");
+/// ```
+pub fn binary_turn_off_trailing_ones(x: usize) -> usize {
+    let w = Wrapping(x);
+    x & (w + ONE).0
+}
+
+/// Converts any trailing 0 bits to 1.
+/// Returns the input if it has no trailing 0 bits.
+///
+/// ```
+/// # use delight::binary_turn_on_trailing_zeros;
+/// let x = usize::from_str_radix("1011000", 2).unwrap();
+/// let y = binary_turn_on_trailing_zeros(x);
+///
+/// assert_eq!(format!("{:b}", y), "1011111");
+/// ```
+pub fn binary_turn_on_trailing_zeros(x: usize) -> usize {
+    let w = Wrapping(x);
+    x | (w - ONE).0
+}
+
 #[cfg(test)]
 mod tests {
 
     use super::*;
-    use test::Bencher;
-
-    const N: usize = 1024;
 
     #[test]
     fn test_binary_turn_off_rightmost_one() {
@@ -57,17 +79,6 @@ mod tests {
         let y = binary_turn_off_rightmost_one(x);
 
         assert_eq!(format!("{:b}", y), "1001100");
-    }
-
-    #[bench]
-    fn bench_binary_turn_off_rightmost_one(b: &mut Bencher) {
-        b.bytes = (std::mem::size_of::<usize>() * N) as u64;
-
-        b.iter(|| {
-            let n = test::black_box(N);
-
-            (0..n).fold(0, |_, x| test::black_box(binary_turn_off_rightmost_one(x)))
-        })
     }
 
     #[test]
@@ -78,19 +89,19 @@ mod tests {
         assert_eq!(format!("{:b}", y), "1011111");
     }
 
-    #[bench]
-    fn bench_binary_turn_on_rightmost_zero(b: &mut Bencher) {
-        b.bytes = (std::mem::size_of::<usize>() * N) as u64;
+    #[test]
+    fn test_binary_turn_off_trailing_ones() {
+        let x = usize::from_str_radix("1011011", 2).unwrap();
+        let y = binary_turn_off_trailing_ones(x);
 
-        b.iter(|| {
-            let n = test::black_box(N);
-
-            (0..n).fold(0, |_, x| test::black_box(binary_turn_on_rightmost_zero(x)))
-        })
+        assert_eq!(format!("{:b}", y), "1011000");
     }
 
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_binary_turn_on_trailing_zeros() {
+        let x = usize::from_str_radix("1011000", 2).unwrap();
+        let y = binary_turn_on_trailing_zeros(x);
+
+        assert_eq!(format!("{:b}", y), "1011111");
     }
 }
