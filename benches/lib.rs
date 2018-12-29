@@ -75,4 +75,15 @@ mod tests {
             (0..n).fold(0, |_, x| test::black_box(binary_rightmost_one_bitmask(x)))
         })
     }
+
+    #[bench]
+    fn bench_binary_trailing_zeros_bitmask(b: &mut Bencher) {
+        b.bytes = (std::mem::size_of::<usize>() * N) as u64;
+
+        b.iter(|| {
+            let n = test::black_box(N);
+
+            (0..n).fold(0, |_, x| test::black_box(binary_trailing_zeros_bitmask(x)))
+        })
+    }
 }

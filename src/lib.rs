@@ -86,8 +86,7 @@ pub fn binary_turn_on_trailing_zeros(x: usize) -> usize {
 pub fn binary_rightmost_zero_bitmask(x: usize) -> usize {
     let w = Wrapping(x);
 
-    // NOTE This uses some transformational logic to get this form.
-    ((ZERO - (w + ONE)) & (w + ONE)).0
+    !x & (w + ONE).0
 }
 
 /// Generates the bitmask identifying the rightmost 1 bit.
@@ -100,11 +99,26 @@ pub fn binary_rightmost_zero_bitmask(x: usize) -> usize {
 /// 
 /// assert_eq!(format!("{:08b}", y), "00001000");
 /// ```
-pub fn binary_rightmost_one_bitmask(x:usize) -> usize {
+pub fn binary_rightmost_one_bitmask(x: usize) -> usize {
     let w = Wrapping(x);
 
-    // NOTE This uses some transformational logic to get this form.
     x & (ZERO - w).0
+}
+
+/// Generates the bitmask identifying any trailing 0 bits.
+/// Returns 0 if there are no trailing 0 bits.
+///
+/// ```
+/// # use delight::binary_trailing_zeros_bitmask;
+/// let x = usize::from_str_radix("11011000", 2).unwrap();
+/// let y = binary_trailing_zeros_bitmask(x);
+///
+/// assert_eq!(format!("{:08b}", y), "00000111");
+/// ```
+pub fn binary_trailing_zeros_bitmask(x: usize) -> usize {
+    let w = Wrapping(x);
+
+    !x & (w - ONE).0
 }
 
 #[cfg(test)]
@@ -158,5 +172,13 @@ mod tests {
         let y = binary_rightmost_one_bitmask(x);
 
         assert_eq!(format!("{:08b}", y), "00001000");
+    }
+
+    #[test]
+    fn test_binary_trailing_zeros_bitmask() {
+        let x = usize::from_str_radix("11011000", 2).unwrap();
+        let y = binary_trailing_zeros_bitmask(x);
+
+        assert_eq!(format!("{:08b}", y), "00000111");
     }
 }
