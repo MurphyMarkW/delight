@@ -121,6 +121,22 @@ pub fn binary_trailing_zeros_bitmask(x: usize) -> usize {
     !x & (w - ONE).0
 }
 
+/// Generates the bitmask identifying any trailing 1 bits.
+/// Returns 0 if there are no trailing 1 bits.
+///
+/// ```
+/// # use delight::binary_trailing_ones_bitmask;
+/// let x = usize::from_str_radix("11011011", 2).unwrap();
+/// let y = binary_trailing_ones_bitmask(x);
+///
+/// assert_eq!(format!("{:08b}", y), "00000011");
+/// ```
+pub fn binary_trailing_ones_bitmask(x: usize) -> usize {
+    let w = Wrapping(x);
+
+    x & !(w + ONE).0
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -180,5 +196,13 @@ mod tests {
         let y = binary_trailing_zeros_bitmask(x);
 
         assert_eq!(format!("{:08b}", y), "00000111");
+    }
+
+    #[test]
+    fn test_binary_trailing_ones_bitmask() {
+        let x = usize::from_str_radix("11011011", 2).unwrap();
+        let y = binary_trailing_ones_bitmask(x);
+
+        assert_eq!(format!("{:08b}", y), "00000011");
     }
 }
