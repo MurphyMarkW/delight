@@ -1,0 +1,18 @@
+language: rust
+
+rust:
+  - nightly
+
+script:
+  - cargo build
+  - cargo bench -- --test
+
+cache: cargo
+before_cache:
+  - rm -rfv target/debug/incremental/delight-*
+  - rm -rfv target/debug/.fingerprint/delight-*
+  - rm -rfv target/debug/build/delight-*
+  - rm -rfv target/debug/deps/libdelight-*
+  - rm -rfv target/debug/deps/delight-*
+  - rm -rfv target/debug/{delight,libdelight}.d
+  - cargo clean -p nui
