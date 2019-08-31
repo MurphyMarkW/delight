@@ -137,6 +137,25 @@ pub fn binary_trailing_ones_bitmask(x: usize) -> usize {
     x & !(w + ONE).0
 }
 
+/// Generates the bitmask with the leftmost contiguous run
+/// of 1 bits disabled.
+/// Returns 0 if there are no trailing 1 bits.
+///
+/// ```
+/// # use delight::binary_trailing_ones_bitmask;
+/// let x = usize::from_str_radix("11011110", 2).unwrap();
+/// let y = binary_leading_ones_bitmask(x);
+///
+/// assert_eq!(format!("{:08b}", y), "11000000");
+/// ```
+pub fn binary_leading_ones_bitmask(x: usize) -> usize {
+    let w = Wrapping(x);
+
+    let rightmost = Wrapping(binary_rightmost_one_bitmask(x));
+
+    ((rightmost + w) & w).0
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -204,5 +223,13 @@ mod tests {
         let y = binary_trailing_ones_bitmask(x);
 
         assert_eq!(format!("{:08b}", y), "00000011");
+    }
+
+    #[test]
+    fn test_binary_leading_ones_bitmask() {
+        let x = usize::from_str_radix("11011110", 2).unwrap();
+        let y = binary_leading_ones_bitmask(x);
+
+        assert_eq!(format!("{:08b}", y), "11000000");
     }
 }
